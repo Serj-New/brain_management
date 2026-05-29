@@ -1,17 +1,18 @@
-# Brain Management — Персональний помічник
+# Команда "Brain Management (Менеджмент головного мозку)" — Персональний помічник
 
-## Структура проєкту
+## Опис
 
-```
-brain_management/
-├── main.py                  # Точка входу
-└── assistant/
-    ├── __init__.py
-    ├── contacts.py          # Класи Field, Name, Phone, Birthday, Record, AddressBook
-    ├── notes.py             # TODO: Класи Tag, Note, Notebook
-    ├── handlers.py          # Обробники команд
-    ├── cli.py               # Головний цикл CLI
-    └── storage.py           # Збереження/завантаження даних
+Консольний персональний помічник для керування контактами та нотатками.
+Дані зберігаються на диску і не втрачаються між сесіями.
+
+## Встановлення
+
+```bash
+# Клонувати або розпакувати проєкт, перейти у папку
+cd brain_management
+
+# Python 3.10+ (стандартна бібліотека, без залежностей)
+python main.py
 ```
 
 ## Запуск
@@ -20,35 +21,121 @@ brain_management/
 python main.py
 ```
 
-## Що вже зроблено (основа з попереднього коду)
+Для виходу введіть `exit` або `close`.
 
-- Класи `Field`, `Name`, `Phone`, `Birthday`, `Record`, `AddressBook` — у `contacts.py`
-- Команди: `add`, `change`, `phone`, `all`, `add-birthday`, `show-birthday`, `birthdays`
-- Збереження/завантаження адресної книги через `pickle` — у `storage.py`
-- Головний цикл CLI — у `cli.py`
+---
 
-## TODO — що потрібно зробити команді
+## Команди
 
-### contacts.py
-- [ ] Клас `Email` з валідацією формату
-- [ ] Клас `Address`
-- [ ] Методи `add_email`, `add_address` у класі `Record`
-- [ ] Метод `search(query)` у класі `AddressBook`
-- [ ] Метод `delete(name)` у класі `AddressBook`
+### Контакти
 
-### notes.py
-- [ ] Клас `Tag`
-- [ ] Клас `Note` (title, content, tags)
-- [ ] Клас `Notebook` з методами: `add_note`, `find`, `delete`, `search`, `search_by_tag`, `sort_by_tag`
+| Команда          | Аргументи                        | Опис                                            |
+| ---------------- | -------------------------------- | ----------------------------------------------- |
+| `add`            | `<name> <phone>`                 | Додати контакт або телефон                      |
+| `change`         | `<name> <old_phone> <new_phone>` | Замінити номер телефону                         |
+| `delete-contact` | `<name>`                         | Видалити контакт                                |
+| `phone`          | `<name>`                         | Показати телефони контакту                      |
+| `all`            | —                                | Усі контакти                                    |
+| `search`         | `<query>`                        | Пошук за ім'ям, телефоном, email, адресою       |
+| `add-email`      | `<name> <email>`                 | Додати або оновити email                        |
+| `add-address`    | `<name> <address>`               | Додати або оновити адресу                       |
+| `add-birthday`   | `<name> <DD.MM.YYYY>`            | Додати день народження                          |
+| `show-birthday`  | `<name>`                         | Показати день народження                        |
+| `birthdays`      | `[days]`                         | Дні народження в наступні N днів (за замовч. 7) |
 
-### storage.py
-- [ ] Розширити `save_data` / `load_data` для збереження `Notebook` разом з `AddressBook`
+### Нотатки
 
-### handlers.py
-- [ ] Додати обробники: `add_email`, `add_address`, `edit_email`, `search_contacts`, `delete_contact`
-- [ ] Додати обробники для нотаток: `add_note`, `edit_note`, `delete_note`, `show_note`, `all_notes`, `search_notes`
-- [ ] Додати обробники для тегів: `add_tag`, `remove_tag`, `search_notes_by_tag`, `sort_notes`
+| Команда        | Аргументи                  | Опис                                  |
+| -------------- | -------------------------- | ------------------------------------- |
+| `add-note`     | `<title> <content...>`     | Нова нотатка                          |
+| `edit-note`    | `<title> <new_content...>` | Редагувати вміст                      |
+| `delete-note`  | `<title>`                  | Видалити нотатку                      |
+| `show-note`    | `<title>`                  | Показати нотатку                      |
+| `all-notes`    | —                          | Усі нотатки                           |
+| `search-notes` | `<query>`                  | Пошук у заголовку або вмісті          |
+| `add-tag`      | `<title> <tag>`            | Додати тег до нотатки                 |
+| `remove-tag`   | `<title> <tag>`            | Видалити тег                          |
+| `search-tag`   | `<tag>`                    | Пошук нотаток за тегом                |
+| `sort-notes`   | —                          | Нотатки, відсортовані за першим тегом |
 
-### cli.py
-- [ ] Підключити `Notebook` до циклу
-- [ ] Додати нові команди у `if/elif` блоки
+### Службові
+
+| Команда          | Опис                   |
+| ---------------- | ---------------------- |
+| `hello`          | Привітання             |
+| `help`           | Список усіх команд     |
+| `exit` / `close` | Зберегти дані та вийти |
+
+---
+
+## Приклади використання
+
+```
+>>> add Mykola 0991234567
+Contact added.
+
+>>> add-email Mykola mykola@example.com
+Email added.
+
+>>> add-address Mykola Kyiv, Khreshchatyk 1
+Address added.
+
+>>> add-birthday Mykola 06.06.1913
+Birthday added.
+
+>>> all
+Contact name: Mykola, phones: 0991234567, email: mykola@example.com, address: Kyiv, Khreshchatyk 1, birthday: 06.06.1913
+
+>>> birthdays 30
+Mykola -> 08.06.2026
+
+>>> add-note Shopping Buy milk and bread
+Note 'Shopping' added.
+
+>>> add-tag Shopping personal
+Tag 'personal' added to note 'Shopping'.
+
+>>> search-tag personal
+Title   : Shopping
+Content : Buy milk and bread
+Tags    : personal
+```
+
+---
+
+## Валідація
+
+- **Телефон**: рівно 10 цифр, лише цифри. Приклад: `0991234567`
+- **Email**: формат `user@domain.tld`. Приклад: `john@example.com`
+- **Дата**: формат `DD.MM.YYYY`. Приклад: `06.06.1913`
+
+При некоректному введенні програма повідомляє про помилку і **не завершується**.
+
+---
+
+## Збереження даних
+
+Дані зберігаються у файлі:
+
+- **Linux/macOS**: `~/.personal_assistant/data.pkl`
+- **Windows**: `C:\Users\<YourName>\.personal_assistant\data.pkl`
+
+Файл створюється автоматично при першому виході командою `exit`.
+
+---
+
+## Структура проєкту
+
+```
+brain_management/
+├── main.py                  # Точка входу
+├── README.md
+└── assistant/
+    ├── __init__.py
+    ├── contacts.py          # Field, Name, Phone, Email, Address, Birthday, Record, AddressBook (Авторка - Тетяна Баталова)
+    ├── notes.py             # Tag, Note, Notebook (Автор - Євгеній Грішаєв)
+    ├── handlers.py          # Обробники команд (Автор - Сергій Новіков)
+    ├── cli.py               # REPL-цикл, диспетчер (Автор - Сергій Новіков)
+    ├── storage.py           # Збереження/завантаження pickle (Автор - Сергій Новіков)
+    └── matcher.py           # Підказки при невідомих командах (Автор - Сергій Новіков)
+```
