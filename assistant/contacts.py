@@ -1,3 +1,4 @@
+import re
 from collections import UserDict
 from datetime import datetime, timedelta, date
 
@@ -25,14 +26,21 @@ class Phone(Field):
         super().__init__(value)
 
 
-# TODO: Додати клас Email з валідацією (наприклад, через регулярний вираз)
-# class Email(Field):
-#     pass
+class Email(Field):
+
+    def __init__(self, value):
+        # Перевірка стандартного формату email: local@domain.tld
+        if not re.fullmatch(
+            r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", value
+        ):
+            raise ValueError(
+                "Invalid email format (expected user@example.com)"
+            )
+        super().__init__(value)
 
 
-# TODO: Додати клас Address
-# class Address(Field):
-#     pass
+class Address(Field):
+    pass
 
 
 # Клас для дня народження
@@ -53,7 +61,8 @@ class Record:
         self.name = Name(name)
         self.phones = []
         self.birthday = None
-        # TODO: Додати поля self.email та self.address
+        self.email = None
+        self.address = None
 
     # Додавання телефону
     def add_phone(self, phone_number):
@@ -88,17 +97,23 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
-    # TODO: Додати методи add_email, add_address
+    def add_email(self, email_address):
+        self.email = Email(email_address)
+
+    def add_address(self, physical_address):
+        self.address = Address(physical_address)
 
     def __str__(self):
         phones = "; ".join(phone.value for phone in self.phones)
         birthday = ""
         if self.birthday:
             birthday = f", birthday: {self.birthday.value.strftime('%d.%m.%Y')}"
-        # TODO: Додати email та address у рядок виводу
+        email = f", email: {self.email.value}" if self.email else ""
+        address = f", address: {self.address.value}" if self.address else ""
+
         return (
             f"Contact name: {self.name.value}, "
-            f"phones: {phones}{birthday}"
+            f"phones: {phones}{email}{address}{birthday}"
         )
 
 
@@ -114,8 +129,31 @@ class AddressBook(UserDict):
     def delete(self, name):
         if name in self.data:
             del self.data[name]
+        else:
+            raise KeyError(f"Contact '{name}' not found")
 
-    # TODO: Додати метод search(query) — пошук за ім'ям, телефоном, email тощо
+    def search(self, query):
+        query = query.lower()
+        results = []
+
+        for record in self.data.values():
+            # Перевіряємо збіг в імені
+            in_name = query in record.name.value.lower()
+            # Перевіряємо збіг у телефонах
+            in_phones = any(query in phone.value for phone in record.phones)
+            # Перевіряємо збіг в email
+            in_email = (
+                record.email and query in record.email.value.lower()
+            ) or False
+            # Перевіряємо збіг в адресі
+            in_address = (
+                record.address and query in record.address.value.lower()
+            ) or False
+
+            if in_name or in_phones or in_email or in_address:
+                results.append(record)
+
+        return results
 
     def get_upcoming_birthdays(self, days=7):
         upcoming_birthdays = []
