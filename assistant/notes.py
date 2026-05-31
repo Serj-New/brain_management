@@ -46,8 +46,7 @@ class Note:
 
 class Notebook(UserDict):
     def add_note(self, note: Note) -> None:
-        if note.title in self.data:
-            raise ValueError(f"Note '{note.title}' already exists.")
+        # Дозволяємо перезаписати нотатку з тим самим заголовком
         self.data[note.title] = note
 
     def find(self, title: str) -> Note | None:

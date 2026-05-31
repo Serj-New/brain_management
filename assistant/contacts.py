@@ -21,9 +21,19 @@ class Name(Field):
 class Phone(Field):
 
     def __init__(self, value):
-        if not value.isdigit() or len(value) != 10:
-            raise ValueError("Phone number must contain 10 digits")
-        super().__init__(value)
+        # Нормалізація: прибираємо пробіли, дефіси, дужки та префікс +380/380
+        normalized = value.strip().replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+        if normalized.startswith("+380"):
+            normalized = "0" + normalized[4:]
+        elif normalized.startswith("380"):
+            normalized = "0" + normalized[3:]
+
+        if not normalized.isdigit() or len(normalized) != 10:
+            raise ValueError(
+                "Invalid phone number. Use 10 digits (e.g. 0991234567) "
+                "or formats like +380991234567 / 380991234567."
+            )
+        super().__init__(normalized)
 
 
 class Email(Field):
